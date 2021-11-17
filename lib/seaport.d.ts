@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js';
+import { PopulatedTransaction } from 'ethers';
 import { EventSubscription } from 'fbemitter';
 import * as Web3 from 'web3';
 import { OpenSeaAPI } from './api';
@@ -316,6 +317,12 @@ export declare class OpenSeaPort {
         recipientAddress?: string;
         referrerAddress?: string;
     }): Promise<string>;
+    prepareFulfillOrder({ order, accountAddress, recipientAddress, referrerAddress }: {
+        order: Order;
+        accountAddress: string;
+        recipientAddress?: string;
+        referrerAddress?: string;
+    }): Promise<PopulatedTransaction>;
     /**
      * Cancel an order on-chain, preventing it from ever being fulfilled.
      * @param param0 __namedParameters Object
@@ -766,6 +773,7 @@ export declare class OpenSeaPort {
      */
     private _getPriceParameters;
     private _getMetadata;
+    private _prepareAtomicMatch;
     private _atomicMatch;
     private _getRequiredAmountForTakingSellOrder;
     private _authorizeOrder;

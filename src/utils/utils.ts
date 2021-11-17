@@ -156,7 +156,7 @@ export async function promisifyCall<T>(
     }
     return result as T
 
-  } catch (error) {
+  } catch (error: any) {
     // Probably method not found, and web3 is a Parity node
     if (onError) {
       onError(error)
@@ -566,7 +566,7 @@ export async function sendRawTransaction(
     }, c))
     return txHashRes.toString()
 
-  } catch (error) {
+  } catch (error: any) {
 
     onError(error)
     throw error
@@ -597,7 +597,7 @@ export async function rawCall(
     }, c))
     return result
 
-  } catch (error) {
+  } catch (error: any) {
     // Probably method not found, and web3 is a Parity node
     if (onError) {
       onError(error)

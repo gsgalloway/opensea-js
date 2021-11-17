@@ -2,7 +2,7 @@ import { PartialReadonlyContractAbi } from './types'
 import { EventAbi } from 'web3'
 import { AnnotatedFunctionABI } from 'wyvern-js/lib/types'
 
-export const getMethod = (abi: PartialReadonlyContractAbi, name: string): AnnotatedFunctionABI => {
+export const getMethod = (abi: PartialReadonlyContractAbi, name: string ): AnnotatedFunctionABI => {
   const methodAbi = abi.find(x => x.type == 'function' && x.name == name)
   if (!methodAbi) {
     throw new Error(`ABI ${name} not found`)
@@ -12,7 +12,7 @@ export const getMethod = (abi: PartialReadonlyContractAbi, name: string): Annota
   return methodAbi as AnnotatedFunctionABI
 }
 
-export const event = (abi: PartialReadonlyContractAbi, name: string): EventAbi => {
+export const event = (abi: PartialReadonlyContractAbi, name: string ): EventAbi => {
   const eventAbi = abi.find(x => x.type == 'event' && x.name == name)
   if (!eventAbi) {
     throw new Error(`ABI ${name} not found`)
@@ -23,7 +23,7 @@ export const event = (abi: PartialReadonlyContractAbi, name: string): EventAbi =
 }
 
 export const DECENTRALAND_AUCTION_CONFIG = {
-  '1': '0xf87e31492faf9a91b02ee0deaad50d51d56d5d4d',
+  '1':  '0xf87e31492faf9a91b02ee0deaad50d51d56d5d4d',
 }
 
 export { ERC20 } from './abi/ERC20'

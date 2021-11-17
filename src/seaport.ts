@@ -1,5 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import { isValidAddress } from 'ethereumjs-util'
+import { PopulatedTransaction } from 'ethers'
 import { EventEmitter, EventSubscription } from 'fbemitter'
 import * as _ from 'lodash'
 import * as Web3 from 'web3'
@@ -875,13 +876,13 @@ export class OpenSeaPort {
     return transactionHash
   }
 
-  public async fulfillOrderTxData(
+  public async prepareFulfillOrder(
     { order, accountAddress, recipientAddress, referrerAddress }:
     { order: Order;
         accountAddress: string;
         recipientAddress?: string;
         referrerAddress?: string; }
-    ): Promise<string> {
+    ): Promise<PopulatedTransaction> {
     const matchingOrder = this._makeMatchingOrder({
       order,
       accountAddress,
@@ -891,8 +892,7 @@ export class OpenSeaPort {
     const { buy, sell } = assignOrdersToSides(order, matchingOrder)
 
     const metadata = this._getMetadata(order, referrerAddress)
-    const transactionData = await this._atomicMatchTxData({ buy, sell, accountAddress, metadata })
-    return transactionData
+    return await this._prepareAtomicMatch({ buy, sell, accountAddress, metadata })
   }
 
   /**
@@ -2387,7 +2387,7 @@ export class OpenSeaPort {
 
       return true
 
-    } catch (error) {
+    } catch (error: any) {
 
       if (retries <= 0) {
         throw new Error(`Error matching this listing: ${error.message}. Please contact the maker or try again later!`)
@@ -2890,10 +2890,10 @@ export class OpenSeaPort {
     return undefined
   }
 
-  private async _atomicMatchTxData(
+  private async _prepareAtomicMatch(
     { buy, sell, accountAddress, metadata = NULL_BLOCK_HASH }:
     { buy: Order; sell: Order; accountAddress: string; metadata?: string }
-  ): Promise<string> {
+  ): Promise<PopulatedTransaction> {
     let value
     let shouldValidateBuy = true
     let shouldValidateSell = true
@@ -2916,7 +2916,7 @@ export class OpenSeaPort {
       // User is neither - matching service
     }
 
-    await this._validateMatch({ buy, sell, accountAddress, shouldValidateBuy, shouldValidateSell })
+    // await this._validateMatch({ buy, sell, accountAddress, shouldValidateBuy, shouldValidateSell })
 
     this._dispatch(EventType.MatchOrders, { buy, sell, accountAddress, matchMetadata: metadata })
 
@@ -2946,7 +2946,13 @@ export class OpenSeaPort {
       ]
     ]
 
-   return this._wyvernProtocol.wyvernExchange.atomicMatch_.getABIEncodedTransactionData(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
+   const data = this._wyvernProtocol.wyvernExchange.atomicMatch_.getABIEncodedTransactionData(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
+
+   return {
+     data,
+     value: value as any,
+    //  gasLimit: new BigNumber(gasEstimate) as any,
+   }
   }
 
   private async _atomicMatch(
@@ -3012,7 +3018,7 @@ export class OpenSeaPort {
 
       txnData.gas = this._correctGasAmount(gasEstimate)
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed atomic match with args: `, args, error)
       throw new Error(`Oops, the Ethereum network rejected this transaction :( The OpenSea devs have been alerted, but this problem is typically due an item being locked or untransferrable. The exact error was "${error.message.substr(0, MAX_ERROR_LENGTH)}..."`)
     }
@@ -3022,7 +3028,7 @@ export class OpenSeaPort {
       this.logger(`Fulfilling order with gas set to ${txnData.gas}`)
       this._wyvernProtocol.wyvernExchange.atomicMatch_.getABIEncodedTransactionData(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
       txHash = await this._wyvernProtocol.wyvernExchange.atomicMatch_.sendTransactionAsync(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], txnData)
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
 
       this._dispatch(EventType.TransactionDenied, { error, buy, sell, accountAddress, matchMetadata: metadata })
@@ -3135,7 +3141,7 @@ export class OpenSeaPort {
       await confirmTransaction(this.web3, transactionHash)
       this.logger(`Transaction succeeded: ${description}`)
       this._dispatch(EventType.TransactionConfirmed, transactionEventData)
-    } catch (error) {
+    } catch (error: any) {
       this.logger(`Transaction failed: ${description}`)
       this._dispatch(EventType.TransactionFailed, {
         ...transactionEventData, error
