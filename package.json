@@ -1,6 +1,6 @@
 {
-  "name": "opensea-js",
-  "version": "1.2.0",
+  "name": "@gsgalloway/opensea-js",
+  "version": "1.2.1",
   "description": "JavaScript SDK for the OpenSea marketplace. Let users buy or sell crypto collectibles and other cryptogoods, all on your own site!",
   "files": [
     "lib",
@@ -8,16 +8,16 @@
   ],
   "main": "lib/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/**/*.ts --require ts-node/register --timeout 15000",
+    "test": "mocha test/**/*.ts --require ts-node/register --timeout 15000",
     "lint": "tslint --project . 'src/**/*.ts' --fix",
     "build": "tsc",
     "docs": "npm run docsHtml",
-    "docsHtml": "./node_modules/.bin/typedoc --target ES5 --exclude src/abi --excludePrivate --out ./docs --ignoreCompilerErrors --mode file",
-    "docsMarkdown": "./node_modules/.bin/typedoc --theme markdown --target ES5 --exclude src/abi --excludePrivate --out ./docs_markdown --ignoreCompilerErrors --mode file"
+    "docsHtml": "typedoc --target ES5 --exclude src/abi --excludePrivate --out ./docs --ignoreCompilerErrors --mode file",
+    "docsMarkdown": "typedoc --theme markdown --target ES5 --exclude src/abi --excludePrivate --out ./docs_markdown --ignoreCompilerErrors --mode file"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ProjectOpenSea/opensea-js.git"
+    "url": "git+https://github.com/gsgalloway/opensea-js.git"
   },
   "keywords": [
     "marketplace",
@@ -78,5 +78,11 @@
     "typescript": "^4.3.5",
     "typescript-eslint-parser": "^16.0.0",
     "web3-typescript-typings": "^0.9.3"
+  },
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "lib": "lib",
+    "test": "test"
   }
 }
